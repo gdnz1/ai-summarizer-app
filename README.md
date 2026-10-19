@@ -1,13 +1,15 @@
 # ⚡ AI Text Summarizer (Hybrid Computer Vision & GenAI Edition)
 
-[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
-[![Google ML Kit](https://img.shields.io/badge/Google_ML_Kit-OCR_Vision-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://developers.google.com/ml-kit/vision/text-recognition)
-[![Groq Cloud](https://img.shields.io/badge/Groq_Cloud-LPU_Inference-F05A28?style=for-the-badge&logo=fastapi&logoColor=white)](https://groq.com)
-[![OpenAI Open-Weights](https://img.shields.io/badge/Model-GPT_OSS_20B_%2F_120B-green?style=for-the-badge)](https://groq.com)
-[![Material 3](https://img.shields.io/badge/Design-Material_3_Dark-7C3AED?style=for-the-badge)](https://m3.material.io)
-[![Localization](https://img.shields.io/badge/i18n-TR_%7C_EN-00B4D8?style=for-the-badge)](lib/l10n/)
-[![Tests](https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge)](test/)
+<p align="center">
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" /></a>
+  <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" /></a>
+  <a href="https://developers.google.com/ml-kit/vision/text-recognition"><img src="https://img.shields.io/badge/Google_ML_Kit-OCR_Vision-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google ML Kit" /></a>
+  <a href="https://groq.com"><img src="https://img.shields.io/badge/Groq_Cloud-LPU_Inference-F05A28?style=for-the-badge&logo=fastapi&logoColor=white" alt="Groq Cloud" /></a>
+  <a href="https://groq.com"><img src="https://img.shields.io/badge/Model-GPT_OSS_20B_%2F_120B-green?style=for-the-badge" alt="Model" /></a>
+  <a href="https://m3.material.io"><img src="https://img.shields.io/badge/Design-Material_3_Dark-7C3AED?style=for-the-badge" alt="Material 3" /></a>
+  <a href="lib/l10n/"><img src="https://img.shields.io/badge/i18n-TR_%7C_EN-00B4D8?style=for-the-badge" alt="i18n" /></a>
+  <a href="test/"><img src="https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge" alt="Tests" /></a>
+</p>
 
 A production-grade, cross-platform **Computer Vision + Generative AI** mobile application built with Flutter. 
 
@@ -15,15 +17,25 @@ Bridges **On-Device Machine Learning (Google ML Kit OCR)** with **Cloud LLM Infe
 
 ---
 
+## 📱 Application Preview
+
+<p align="center">
+  <img src="images/app_preview.jpg" alt="AI Summarizer Mobile Interface Preview" width="340" style="border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+  <br />
+  <em>Live in-app screenshot on Android: Single-screen compact view featuring Camera OCR scan, bilingual switcher, and rich Markdown bullet synthesis.</em>
+</p>
+
+---
+
 ## 🌟 Key Highlights
 
 * 📷 **On-Device Computer Vision (OCR):** Powered by Google ML Kit's Latin script text recognizer. Snaps photos directly via camera or imports from gallery to extract text with zero cloud cost, 100% offline, and zero API token consumption.
 * 🌍 **Bilingual UI & Cross-Lingual Summarization:** Instant switching between **Turkish 🇹🇷** and **English 🇬🇧**. Supports cross-lingual synthesis: feed text in any language, and the LLM translates and synthesizes directly into the chosen target language.
+* 💎 **Rich Markdown Rendering:** Employs `flutter_markdown` with a custom dark-theme stylesheet. Concepts and takeaways are styled with vibrant Cyan (`#38BDF8`) emphasis, formatted bullet lists, and automatic table rendering for academic outputs.
 * 🚀 **Zero-Cost & Ultra-Low Latency Inference:** Connected to Groq's LPU™ (Language Processing Unit) running open-weights reasoning models (`openai/gpt-oss-20b` and `120b`), generating summaries in sub-second intervals.
 * 🎯 **Persona-Driven Prompt Engineering:** Supports 3 specialized summarization modes tailored to distinct user needs (*Executive*, *Academic*, *Key Takeaways*).
 * 🛡️ **Anti-Hallucination Guardrails:** System prompts strictly enforce ground-truth adherence, preventing model embellishment or unsupported extrapolation.
-* 🌐 **Multilingual Intelligence:** Automatically detects and mirrors the language of the source text (Turkish, English, etc.).
-* 📋 **Streamlined UX:** One-click clipboard pasting, instant copy-to-clipboard, real-time word/character counters, and floating error notifications.
+* 🔒 **Portrait-Only Lock:** Screen orientation is strictly locked to portrait mode across both native Android and Flutter layers for a seamless mobile experience.
 * 🔒 **Security Hygiene:** Zero hardcoded API secrets in version control; configured for runtime `--dart-define-from-file=.env` key injection.
 * 🧪 **Automated Testing:** Covered by unit tests for prompt generation stability and widget tests for responsive UI validation.
 
@@ -44,7 +56,7 @@ flowchart TD
         Input["Multi-line TextField & Live Word/Char Counter"]
         ModeSelector["Interactive ModeSelectorBar (Executive / Academic / Bullets)"]
         ActionBtn["Summarize Action Button & Loading Indicator"]
-        OutputCard["SummaryCard with SelectableText & Clipboard Copy"]
+        OutputCard["SummaryCard with Rich MarkdownBody & Clipboard Copy"]
     end
 
     subgraph CoreEngine ["Domain & Service Layer"]
@@ -61,17 +73,17 @@ flowchart TD
     CameraSource --> OcrSheet
     GallerySource --> OcrSheet
     OcrSheet --> MLKitEngine
-    MLKitEngine -->|Extracted Raw Text| Input
+    MLKitEngine -->|"Extracted Raw Text"| Input
 
     Input --> ActionBtn
     ModeSelector --> PromptEngine
     ActionBtn --> Service
     Config --> Service
     PromptEngine --> Service
-    Service -->|HTTPS POST (JSON)| GroqAPI
+    Service -->|"HTTPS POST (JSON)"| GroqAPI
     GroqAPI --> LLM
-    LLM -->|Inference Stream| GroqAPI
-    GroqAPI -->|JSON Payload| Service
+    LLM -->|"Inference Stream"| GroqAPI
+    GroqAPI -->|"JSON Payload"| Service
     Service --> OutputCard
 ```
 
@@ -83,7 +95,7 @@ flowchart TD
 | :--- | :--- | :---: | :--- | :--- |
 | **Executive** | C-Level Briefing Analyst | `0.20` | Core impact, bottom-line takeaways, decision-making focus. | 2–3 concise sentences. |
 | **Academic** | Research Scholar | `0.30` | Methodological accuracy, technical rigor, context preservation. | Structured scholarly narrative & tables. |
-| **Key Takeaways**| Strategic Knowledge Synthesizer | `0.25` | Quick scanning, high informational density. | 4–6 bolded bullet points. |
+| **Key Takeaways**| Strategic Knowledge Synthesizer | `0.25` | Quick scanning, high informational density. | 4–6 bolded bullet points with cyan accents. |
 
 ---
 
@@ -118,7 +130,7 @@ flutter run -d chrome --dart-define-from-file=.env
 # Android (With Live Camera OCR support)
 flutter run -d android --dart-define-from-file=.env
 
-# Build Android APK
+# Build Standalone Android APK
 flutter build apk --debug --dart-define-from-file=.env
 ```
 
@@ -126,8 +138,15 @@ flutter build apk --debug --dart-define-from-file=.env
 
 ## 🧪 Automated Testing
 
+Run the test suite containing prompt generation unit tests and UI widget tests:
+
 ```bash
 flutter test
+```
+
+Sample output:
+```text
+00:01 +5: All tests passed!
 ```
 
 ---
@@ -135,7 +154,7 @@ flutter test
 ## 🔮 Future Roadmap
 
 * 📄 **Multi-page PDF Scanning:** Processing multi-page lecture slide decks into a single consolidated executive brief.
-* 🎙️ **Audio-to-Text (Whisper):** Real-time voice note and lecture recording transcription.
+* 🎙️ **Audio-to-Text (Whisper):** Real-time voice note and lecture recording transcription via Groq Whisper API.
 * 🌐 **Offline LLM Integration:** Fallback to local on-device small language models (Gemma 2B / Llama 3.2 1B).
 
 ---
