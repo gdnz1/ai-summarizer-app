@@ -6,17 +6,19 @@
 [![Groq Cloud](https://img.shields.io/badge/Groq_Cloud-LPU_Inference-F05A28?style=for-the-badge&logo=fastapi&logoColor=white)](https://groq.com)
 [![OpenAI Open-Weights](https://img.shields.io/badge/Model-GPT_OSS_20B_%2F_120B-green?style=for-the-badge)](https://groq.com)
 [![Material 3](https://img.shields.io/badge/Design-Material_3_Dark-7C3AED?style=for-the-badge)](https://m3.material.io)
+[![Localization](https://img.shields.io/badge/i18n-TR_%7C_EN-00B4D8?style=for-the-badge)](lib/l10n/)
 [![Tests](https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge)](test/)
 
 A production-grade, cross-platform **Computer Vision + Generative AI** mobile application built with Flutter. 
 
-Bridges **On-Device Machine Learning (Google ML Kit OCR)** with **Cloud LLM Inference (Groq Cloud Engine)** to capture, recognize, and synthesize text from camera snapshots, gallery images, or manual input in sub-second latency.
+Bridges **On-Device Machine Learning (Google ML Kit OCR)** with **Cloud LLM Inference (Groq Cloud Engine)** to capture, recognize, and synthesize text from camera snapshots, gallery images, or manual input in sub-second latency with full **Bilingual Localization (Turkish 🇹🇷 / English 🇬🇧)**.
 
 ---
 
 ## 🌟 Key Highlights
 
 * 📷 **On-Device Computer Vision (OCR):** Powered by Google ML Kit's Latin script text recognizer. Snaps photos directly via camera or imports from gallery to extract text with zero cloud cost, 100% offline, and zero API token consumption.
+* 🌍 **Bilingual UI & Cross-Lingual Summarization:** Instant switching between **Turkish 🇹🇷** and **English 🇬🇧**. Supports cross-lingual synthesis: feed text in any language, and the LLM translates and synthesizes directly into the chosen target language.
 * 🚀 **Zero-Cost & Ultra-Low Latency Inference:** Connected to Groq's LPU™ (Language Processing Unit) running open-weights reasoning models (`openai/gpt-oss-20b` and `120b`), generating summaries in sub-second intervals.
 * 🎯 **Persona-Driven Prompt Engineering:** Supports 3 specialized summarization modes tailored to distinct user needs (*Executive*, *Academic*, *Key Takeaways*).
 * 🛡️ **Anti-Hallucination Guardrails:** System prompts strictly enforce ground-truth adherence, preventing model embellishment or unsupported extrapolation.
