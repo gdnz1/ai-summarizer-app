@@ -42,12 +42,18 @@ class PromptEngine {
       case SummaryMode.academic:
         return 'You are an academic research scholar. '
             'Your goal is to provide a structured, in-depth academic summary preserving technical accuracy, '
-            'context, hypotheses, arguments, and conclusions. Maintain an objective, scholarly tone.\n\n$baseRules';
+            'context, hypotheses, arguments, and conclusions. Maintain an objective, scholarly tone. '
+            'Use clean Markdown formatting with subheadings (###) and bold emphasis where appropriate.\n\n$baseRules';
 
       case SummaryMode.keyTakeaways:
         return 'You are a strategic synthesis expert. '
             'Your goal is to extract the most critical insights into 4 to 6 clean, structured bullet points. '
-            'Start each bullet point with a bolded 2-3 word concept followed by a concise explanation.\n\n$baseRules';
+            'Format each point as a Markdown list item starting with "- ", '
+            'followed by a bolded concept title, an en-dash or colon, and a concise explanation. '
+            'Always separate each bullet item with an empty blank line for optimal readability.\n\n'
+            'Example:\n'
+            '- **Core Concept** – Explanation of this critical aspect.\n\n'
+            '- **Key Factor** – Explanation of the secondary element.\n\n$baseRules';
     }
   }
 }
