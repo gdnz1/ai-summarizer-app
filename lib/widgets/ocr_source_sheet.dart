@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../l10n/app_strings.dart';
+
 /// Bottom sheet dialog allowing the user to select an OCR image source.
 class OcrSourceSheet extends StatelessWidget {
-  const OcrSourceSheet({super.key});
+  const OcrSourceSheet({super.key, required this.strings});
+
+  final AppStrings strings;
 
   /// Displays the modal sheet and returns the selected [ImageSource].
-  static Future<ImageSource?> show(BuildContext context) {
+  static Future<ImageSource?> show(BuildContext context, AppStrings strings) {
     return showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: const Color(0xFF1E293B),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => const OcrSourceSheet(),
+      builder: (context) => OcrSourceSheet(strings: strings),
     );
   }
 
@@ -37,10 +41,10 @@ class OcrSourceSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
-            const Text(
-              'Scan Document via OCR',
+            Text(
+              strings.ocrSheetTitle,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -48,7 +52,7 @@ class OcrSourceSheet extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Select an image source to extract text using on-device ML Kit.',
+              strings.ocrSheetSubtitle,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.65),
@@ -58,15 +62,15 @@ class OcrSourceSheet extends StatelessWidget {
             const SizedBox(height: 22),
             _SourceTile(
               icon: Icons.camera_alt_rounded,
-              title: 'Camera',
-              subtitle: 'Snap a live photo of a book, document, or slide',
+              title: strings.ocrCameraTitle,
+              subtitle: strings.ocrCameraSubtitle,
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             const SizedBox(height: 12),
             _SourceTile(
               icon: Icons.photo_library_rounded,
-              title: 'Gallery',
-              subtitle: 'Select an existing screenshot or saved photo',
+              title: strings.ocrGalleryTitle,
+              subtitle: strings.ocrGallerySubtitle,
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
             const SizedBox(height: 12),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import '../models/summary_mode.dart';
 
 /// Interactive selector bar allowing users to switch between summarization personas.
@@ -8,10 +9,12 @@ class ModeSelectorBar extends StatelessWidget {
     super.key,
     required this.selectedMode,
     required this.onModeChanged,
+    required this.strings,
   });
 
   final SummaryMode selectedMode;
   final ValueChanged<SummaryMode> onModeChanged;
+  final AppStrings strings;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +66,7 @@ class ModeSelectorBar extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          mode.label,
+                          strings.modeLabel(mode),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -83,8 +86,8 @@ class ModeSelectorBar extends StatelessWidget {
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
           child: Text(
-            selectedMode.description,
-            key: ValueKey(selectedMode),
+            strings.modeDescription(selectedMode),
+            key: ValueKey('${selectedMode}_${strings.language}'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
