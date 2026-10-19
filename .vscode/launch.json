@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ai_summarizer_app (Web)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "chrome",
+      "args": [
+        "--dart-define-from-file=.env"
+      ]
+    },
+    {
+      "name": "ai_summarizer_app (Windows)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "windows",
+      "args": [
+        "--dart-define-from-file=.env"
+      ]
+    }
+  ]
+}
