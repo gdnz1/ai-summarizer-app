@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../l10n/app_strings.dart';
+import '../models/app_language.dart';
 import '../models/summary_mode.dart';
 import '../services/groq_summarizer_service.dart';
 import '../services/ocr_service.dart';
+import '../widgets/language_selector_button.dart';
 import '../widgets/mode_selector_bar.dart';
 import '../widgets/ocr_source_sheet.dart';
 
@@ -21,11 +24,14 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
   final GroqSummarizerService _summarizerService = GroqSummarizerService();
   final OcrService _ocrService = OcrService();
 
+  AppLanguage _selectedLanguage = AppLanguage.tr;
   SummaryMode _selectedMode = SummaryMode.executive;
   bool _isLoading = false;
   bool _isScanning = false;
   String _summary = '';
   SummaryMode? _lastSummarizedMode;
+
+  AppStrings get _strings => AppStrings.of(_selectedLanguage);
 
   @override
   void initState() {
@@ -51,7 +57,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
     final inputText = _textController.text.trim();
 
     if (inputText.isEmpty) {
-      _showMessage('Please enter, paste, or scan text to summarize.', isError: true);
+      _showMessage(_strings.emptyInputError, isError: true);
       return;
     }
 
@@ -65,6 +71,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
       final summary = await _summarizerService.summarizeText(
         text: inputText,
         mode: _selectedMode,
+        language: _selectedLanguage,
       );
 
       if (!mounted) return;
@@ -90,11 +97,11 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
 
   Future<void> _handleOcrScan() async {
     if (kIsWeb) {
-      _showMessage('On-device OCR is optimized for mobile (Android & iOS).');
+      _showMessage(_strings.webOcrNotice);
       return;
     }
 
-    final source = await OcrSourceSheet.show(context);
+    final source = await OcrSourceSheet.show(context, _strings);
     if (source == null) return;
 
     setState(() => _isScanning = true);
@@ -109,7 +116,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
       if (extractedText != null && extractedText.isNotEmpty) {
         _textController.text = extractedText;
         final count = extractedText.split(RegExp(r'\s+')).length;
-        _showMessage('Scanned $count words from image via OCR!');
+        _showMessage(_strings.scannedSuccess(count));
       }
     } catch (error) {
       if (!mounted) return;
@@ -136,14 +143,14 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
     final data = await Clipboard.getData(Clipboard.kTextPlain);
     if (data?.text != null && data!.text!.isNotEmpty) {
       _textController.text = data.text!;
-      _showMessage('Text pasted from clipboard.');
+      _showMessage(_strings.clipboardPasted);
     }
   }
 
   void _copySummary() {
     if (_summary.isEmpty) return;
     Clipboard.setData(ClipboardData(text: _summary));
-    _showMessage('Summary copied to clipboard!');
+    _showMessage(_strings.summaryCopied);
   }
 
   void _showMessage(String message, {bool isError = false}) {
@@ -168,7 +175,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -185,17 +192,25 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            const Text(
-              'AI Summarizer',
-              style: TextStyle(
+            Text(
+              _strings.appTitle,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w800,
-                fontSize: 20,
+                fontSize: 18,
                 letterSpacing: -0.3,
               ),
             ),
           ],
         ),
+        actions: [
+          LanguageSelectorButton(
+            selectedLanguage: _selectedLanguage,
+            onLanguageChanged: (lang) {
+              setState(() => _selectedLanguage = lang);
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -210,7 +225,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Hybrid Computer Vision OCR + Cloud GenAI Summarization',
+                      _strings.appSubtitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.70),
@@ -221,6 +236,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                     const SizedBox(height: 20),
                     ModeSelectorBar(
                       selectedMode: _selectedMode,
+                      strings: _strings,
                       onModeChanged: (mode) {
                         setState(() => _selectedMode = mode);
                       },
@@ -235,9 +251,9 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: const Color(0xFF38BDF8)),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               width: 18,
                               height: 18,
                               child: CircularProgressIndicator(
@@ -245,11 +261,11 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                                 color: Color(0xFF38BDF8),
                               ),
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                'Scanning image with on-device Computer Vision OCR...',
-                                style: TextStyle(
+                                _strings.scanningBanner,
+                                style: const TextStyle(
                                   color: Color(0xFF38BDF8),
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
@@ -263,6 +279,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                       controller: _textController,
                       wordCount: _wordCount,
                       charCount: _charCount,
+                      strings: _strings,
                       onClear: _clearInput,
                       onPaste: _pasteFromClipboard,
                       onScan: _handleOcrScan,
@@ -285,7 +302,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                                 ),
                               )
                             : Text(
-                                'Summarize (${_selectedMode.label})',
+                                _strings.summarizeButton(_selectedMode),
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -308,6 +325,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                     _SummaryCard(
                       summary: _summary,
                       mode: _lastSummarizedMode,
+                      strings: _strings,
                       onCopy: _copySummary,
                     ),
                     const SizedBox(height: 20),
@@ -327,6 +345,7 @@ class _InputCard extends StatelessWidget {
     required this.controller,
     required this.wordCount,
     required this.charCount,
+    required this.strings,
     required this.onClear,
     required this.onPaste,
     required this.onScan,
@@ -335,6 +354,7 @@ class _InputCard extends StatelessWidget {
   final TextEditingController controller;
   final int wordCount;
   final int charCount;
+  final AppStrings strings;
   final VoidCallback onClear;
   final VoidCallback onPaste;
   final VoidCallback onScan;
@@ -359,7 +379,7 @@ class _InputCard extends StatelessWidget {
             style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.45),
             cursorColor: const Color(0xFF38BDF8),
             decoration: InputDecoration(
-              hintText: 'Type, paste, or scan notes/documents via camera...',
+              hintText: strings.inputHint,
               hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.40)),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(18),
@@ -371,7 +391,7 @@ class _InputCard extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  '$wordCount words | $charCount chars',
+                  strings.stats(wordCount, charCount),
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 12,
@@ -382,7 +402,7 @@ class _InputCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onScan,
                   icon: const Icon(Icons.document_scanner_rounded, size: 16),
-                  label: const Text('Scan'),
+                  label: Text(strings.scanAction),
                   style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFF38BDF8),
                     visualDensity: VisualDensity.compact,
@@ -393,7 +413,7 @@ class _InputCard extends StatelessWidget {
                   TextButton.icon(
                     onPressed: onPaste,
                     icon: const Icon(Icons.paste_rounded, size: 16),
-                    label: const Text('Paste'),
+                    label: Text(strings.pasteAction),
                     style: TextButton.styleFrom(
                       foregroundColor: const Color(0xFF38BDF8),
                       visualDensity: VisualDensity.compact,
@@ -402,7 +422,7 @@ class _InputCard extends StatelessWidget {
                 ],
                 if (hasText)
                   IconButton(
-                    tooltip: 'Clear input',
+                    tooltip: strings.clearTooltip,
                     onPressed: onClear,
                     icon: const Icon(Icons.clear_rounded, size: 18),
                     color: Colors.white54,
@@ -421,11 +441,13 @@ class _SummaryCard extends StatelessWidget {
   const _SummaryCard({
     required this.summary,
     required this.mode,
+    required this.strings,
     required this.onCopy,
   });
 
   final String summary;
   final SummaryMode? mode;
+  final AppStrings strings;
   final VoidCallback onCopy;
 
   @override
@@ -463,9 +485,7 @@ class _SummaryCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                hasSummary && mode != null
-                    ? '${mode!.label} Summary'
-                    : 'Summary',
+                strings.summaryTitle(mode),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
@@ -477,7 +497,7 @@ class _SummaryCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onCopy,
                   icon: const Icon(Icons.copy_rounded, size: 16),
-                  label: const Text('Copy'),
+                  label: Text(strings.copyAction),
                   style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFF38BDF8),
                     visualDensity: VisualDensity.compact,
@@ -487,9 +507,7 @@ class _SummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           SelectableText(
-            hasSummary
-                ? summary
-                : 'Your synthesized AI summary will appear here.',
+            hasSummary ? summary : strings.summaryPlaceholder,
             style: TextStyle(
               color: hasSummary ? Colors.white : Colors.white38,
               fontSize: 15,
