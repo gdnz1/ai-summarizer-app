@@ -40,7 +40,7 @@ class GroqSummarizerService {
       'model': ApiConfig.model,
       'messages': PromptEngine.buildMessages(text: trimmed, mode: mode),
       'temperature': mode.temperature,
-      'max_tokens': 1024,
+      'max_tokens': 2048,
       'stream': false,
     });
 
