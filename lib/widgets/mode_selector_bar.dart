@@ -32,7 +32,7 @@ class ModeSelectorBar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? const Color(0xFF38BDF8).withValues(alpha: 0.15)
@@ -59,16 +59,16 @@ class ModeSelectorBar extends StatelessWidget {
                       children: [
                         Icon(
                           mode.icon,
-                          size: 20,
+                          size: 19,
                           color: isSelected
                               ? const Color(0xFF38BDF8)
                               : Colors.white70,
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         Text(
                           strings.modeLabel(mode),
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11.5,
                             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                             color: isSelected ? Colors.white : Colors.white60,
                           ),
@@ -82,7 +82,7 @@ class ModeSelectorBar extends StatelessWidget {
             );
           }).toList(),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 6),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
           child: Text(
@@ -90,7 +90,7 @@ class ModeSelectorBar extends StatelessWidget {
             key: ValueKey('${selectedMode}_${strings.language}'),
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 12,
               color: const Color(0xFF38BDF8).withValues(alpha: 0.85),
               fontStyle: FontStyle.italic,
             ),

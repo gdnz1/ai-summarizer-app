@@ -229,11 +229,11 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.70),
-                        fontSize: 14,
-                        height: 1.4,
+                        fontSize: 13,
+                        height: 1.35,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
                     ModeSelectorBar(
                       selectedMode: _selectedMode,
                       strings: _strings,
@@ -241,11 +241,11 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                         setState(() => _selectedMode = mode);
                       },
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 12),
                     if (_isScanning)
                       Container(
-                        margin: const EdgeInsets.only(bottom: 14),
-                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: const Color(0xFF0284C7).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(14),
@@ -254,20 +254,20 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                         child: Row(
                           children: [
                             const SizedBox(
-                              width: 18,
-                              height: 18,
+                              width: 16,
+                              height: 16,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
                                 color: Color(0xFF38BDF8),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 _strings.scanningBanner,
                                 style: const TextStyle(
                                   color: Color(0xFF38BDF8),
-                                  fontSize: 13,
+                                  fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -284,27 +284,27 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                       onPaste: _pasteFromClipboard,
                       onScan: _handleOcrScan,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     SizedBox(
-                      height: 54,
+                      height: 48,
                       child: ElevatedButton.icon(
                         onPressed: _isLoading || _isScanning ? null : _summarizeText,
                         icon: _isLoading
                             ? const SizedBox.shrink()
-                            : const Icon(Icons.bolt_rounded, size: 22),
+                            : const Icon(Icons.bolt_rounded, size: 20),
                         label: _isLoading
                             ? const SizedBox(
-                                height: 22,
-                                width: 22,
+                                height: 20,
+                                width: 20,
                                 child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
+                                  strokeWidth: 2.2,
                                   color: Colors.white,
                                 ),
                               )
                             : Text(
                                 _strings.summarizeButton(_selectedMode),
                                 style: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -313,22 +313,22 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                           foregroundColor: const Color(0xFF082F49),
                           disabledBackgroundColor: const Color(0xFF334155),
                           disabledForegroundColor: Colors.white70,
-                          elevation: 6,
+                          elevation: 5,
                           shadowColor: const Color(0x6638BDF8),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 14),
                     _SummaryCard(
                       summary: _summary,
                       mode: _lastSummarizedMode,
                       strings: _strings,
                       onCopy: _copySummary,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 14),
                   ],
                 ),
               ),
@@ -373,36 +373,36 @@ class _InputCard extends StatelessWidget {
         children: [
           TextField(
             controller: controller,
-            minLines: 8,
-            maxLines: 14,
+            minLines: 3,
+            maxLines: 6,
             keyboardType: TextInputType.multiline,
-            style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.45),
+            style: const TextStyle(color: Colors.white, fontSize: 14.5, height: 1.4),
             cursorColor: const Color(0xFF38BDF8),
             decoration: InputDecoration(
               hintText: strings.inputHint,
               hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.40)),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.all(18),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
           ),
           const Divider(height: 1, color: Color(0xFF334155)),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             child: Row(
               children: [
                 Text(
                   strings.stats(wordCount, charCount),
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.5),
-                    fontSize: 12,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const Spacer(),
                 TextButton.icon(
                   onPressed: onScan,
-                  icon: const Icon(Icons.document_scanner_rounded, size: 16),
-                  label: Text(strings.scanAction),
+                  icon: const Icon(Icons.document_scanner_rounded, size: 15),
+                  label: Text(strings.scanAction, style: const TextStyle(fontSize: 12.5)),
                   style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFF38BDF8),
                     visualDensity: VisualDensity.compact,
@@ -412,8 +412,8 @@ class _InputCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   TextButton.icon(
                     onPressed: onPaste,
-                    icon: const Icon(Icons.paste_rounded, size: 16),
-                    label: Text(strings.pasteAction),
+                    icon: const Icon(Icons.paste_rounded, size: 15),
+                    label: Text(strings.pasteAction, style: const TextStyle(fontSize: 12.5)),
                     style: TextButton.styleFrom(
                       foregroundColor: const Color(0xFF38BDF8),
                       visualDensity: VisualDensity.compact,
@@ -424,7 +424,7 @@ class _InputCard extends StatelessWidget {
                   IconButton(
                     tooltip: strings.clearTooltip,
                     onPressed: onClear,
-                    icon: const Icon(Icons.clear_rounded, size: 18),
+                    icon: const Icon(Icons.clear_rounded, size: 17),
                     color: Colors.white54,
                     visualDensity: VisualDensity.compact,
                   ),
@@ -455,7 +455,7 @@ class _SummaryCard extends StatelessWidget {
     final hasSummary = summary.isNotEmpty;
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF111827),
         borderRadius: BorderRadius.circular(18),
@@ -481,14 +481,14 @@ class _SummaryCard extends StatelessWidget {
               Icon(
                 hasSummary ? (mode?.icon ?? Icons.auto_awesome) : Icons.auto_awesome,
                 color: hasSummary ? const Color(0xFF38BDF8) : Colors.white38,
-                size: 20,
+                size: 19,
               ),
               const SizedBox(width: 8),
               Text(
                 strings.summaryTitle(mode),
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 17,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -496,8 +496,8 @@ class _SummaryCard extends StatelessWidget {
               if (hasSummary)
                 TextButton.icon(
                   onPressed: onCopy,
-                  icon: const Icon(Icons.copy_rounded, size: 16),
-                  label: Text(strings.copyAction),
+                  icon: const Icon(Icons.copy_rounded, size: 15),
+                  label: Text(strings.copyAction, style: const TextStyle(fontSize: 12.5)),
                   style: TextButton.styleFrom(
                     foregroundColor: const Color(0xFF38BDF8),
                     visualDensity: VisualDensity.compact,
@@ -505,13 +505,13 @@ class _SummaryCard extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           SelectableText(
             hasSummary ? summary : strings.summaryPlaceholder,
             style: TextStyle(
               color: hasSummary ? Colors.white : Colors.white38,
-              fontSize: 15,
-              height: 1.55,
+              fontSize: 14.5,
+              height: 1.5,
             ),
           ),
         ],
@@ -519,3 +519,4 @@ class _SummaryCard extends StatelessWidget {
     );
   }
 }
+
