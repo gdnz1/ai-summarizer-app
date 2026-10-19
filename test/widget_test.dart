@@ -17,6 +17,7 @@ void main() {
     // Verify Input TextField and Initial State
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text('0 words | 0 chars'), findsOneWidget);
+    expect(find.text('Scan'), findsOneWidget);
     expect(find.text('Paste'), findsOneWidget);
 
     // Verify Action Button

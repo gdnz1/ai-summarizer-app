@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../models/summary_mode.dart';
 import '../services/groq_summarizer_service.dart';
+import '../services/ocr_service.dart';
 import '../widgets/mode_selector_bar.dart';
+import '../widgets/ocr_source_sheet.dart';
 
 class SummarizerScreen extends StatefulWidget {
   const SummarizerScreen({super.key});
@@ -15,9 +19,11 @@ class SummarizerScreen extends StatefulWidget {
 class _SummarizerScreenState extends State<SummarizerScreen> {
   final TextEditingController _textController = TextEditingController();
   final GroqSummarizerService _summarizerService = GroqSummarizerService();
+  final OcrService _ocrService = OcrService();
 
   SummaryMode _selectedMode = SummaryMode.executive;
   bool _isLoading = false;
+  bool _isScanning = false;
   String _summary = '';
   SummaryMode? _lastSummarizedMode;
 
@@ -45,7 +51,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
     final inputText = _textController.text.trim();
 
     if (inputText.isEmpty) {
-      _showMessage('Please enter or paste text to summarize.', isError: true);
+      _showMessage('Please enter, paste, or scan text to summarize.', isError: true);
       return;
     }
 
@@ -78,6 +84,42 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
         setState(() {
           _isLoading = false;
         });
+      }
+    }
+  }
+
+  Future<void> _handleOcrScan() async {
+    if (kIsWeb) {
+      _showMessage('On-device OCR is optimized for mobile (Android & iOS).');
+      return;
+    }
+
+    final source = await OcrSourceSheet.show(context);
+    if (source == null) return;
+
+    setState(() => _isScanning = true);
+
+    try {
+      final extractedText = source == ImageSource.camera
+          ? await _ocrService.extractTextFromCamera()
+          : await _ocrService.extractTextFromGallery();
+
+      if (!mounted) return;
+
+      if (extractedText != null && extractedText.isNotEmpty) {
+        _textController.text = extractedText;
+        final count = extractedText.split(RegExp(r'\s+')).length;
+        _showMessage('Scanned $count words from image via OCR!');
+      }
+    } catch (error) {
+      if (!mounted) return;
+      _showMessage(
+        error.toString().replaceFirst('Exception: ', ''),
+        isError: true,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isScanning = false);
       }
     }
   }
@@ -168,7 +210,7 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'High-speed intelligent summarization powered by Groq & Llama 3.3',
+                      'Hybrid Computer Vision OCR + Cloud GenAI Summarization',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.70),
@@ -184,18 +226,52 @@ class _SummarizerScreenState extends State<SummarizerScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
+                    if (_isScanning)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 14),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0284C7).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFF38BDF8)),
+                        ),
+                        child: const Row(
+                          children: [
+                            SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Color(0xFF38BDF8),
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Scanning image with on-device Computer Vision OCR...',
+                                style: TextStyle(
+                                  color: Color(0xFF38BDF8),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     _InputCard(
                       controller: _textController,
                       wordCount: _wordCount,
                       charCount: _charCount,
                       onClear: _clearInput,
                       onPaste: _pasteFromClipboard,
+                      onScan: _handleOcrScan,
                     ),
                     const SizedBox(height: 16),
                     SizedBox(
                       height: 54,
                       child: ElevatedButton.icon(
-                        onPressed: _isLoading ? null : _summarizeText,
+                        onPressed: _isLoading || _isScanning ? null : _summarizeText,
                         icon: _isLoading
                             ? const SizedBox.shrink()
                             : const Icon(Icons.bolt_rounded, size: 22),
@@ -253,6 +329,7 @@ class _InputCard extends StatelessWidget {
     required this.charCount,
     required this.onClear,
     required this.onPaste,
+    required this.onScan,
   });
 
   final TextEditingController controller;
@@ -260,6 +337,7 @@ class _InputCard extends StatelessWidget {
   final int charCount;
   final VoidCallback onClear;
   final VoidCallback onPaste;
+  final VoidCallback onScan;
 
   @override
   Widget build(BuildContext context) {
@@ -281,7 +359,7 @@ class _InputCard extends StatelessWidget {
             style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.45),
             cursorColor: const Color(0xFF38BDF8),
             decoration: InputDecoration(
-              hintText: 'Paste long text, articles, or lecture notes here...',
+              hintText: 'Type, paste, or scan notes/documents via camera...',
               hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.40)),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(18),
@@ -301,7 +379,17 @@ class _InputCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                if (!hasText)
+                TextButton.icon(
+                  onPressed: onScan,
+                  icon: const Icon(Icons.document_scanner_rounded, size: 16),
+                  label: const Text('Scan'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF38BDF8),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+                if (!hasText) ...[
+                  const SizedBox(width: 4),
                   TextButton.icon(
                     onPressed: onPaste,
                     icon: const Icon(Icons.paste_rounded, size: 16),
@@ -311,6 +399,7 @@ class _InputCard extends StatelessWidget {
                       visualDensity: VisualDensity.compact,
                     ),
                   ),
+                ],
                 if (hasText)
                   IconButton(
                     tooltip: 'Clear input',
