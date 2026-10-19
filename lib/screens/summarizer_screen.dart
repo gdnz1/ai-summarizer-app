@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../l10n/app_strings.dart';
@@ -506,17 +507,54 @@ class _SummaryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          SelectableText(
-            hasSummary ? summary : strings.summaryPlaceholder,
-            style: TextStyle(
-              color: hasSummary ? Colors.white : Colors.white38,
-              fontSize: 14.5,
-              height: 1.5,
+          if (!hasSummary)
+            Text(
+              strings.summaryPlaceholder,
+              style: const TextStyle(
+                color: Colors.white38,
+                fontSize: 14.5,
+                height: 1.5,
+              ),
+            )
+          else
+            MarkdownBody(
+              data: summary,
+              selectable: true,
+              styleSheet: MarkdownStyleSheet(
+                p: const TextStyle(
+                  color: Color(0xFFF1F5F9),
+                  fontSize: 14.5,
+                  height: 1.55,
+                ),
+                strong: const TextStyle(
+                  color: Color(0xFF38BDF8),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14.5,
+                ),
+                em: const TextStyle(
+                  color: Color(0xFF94A3B8),
+                  fontStyle: FontStyle.italic,
+                ),
+                listBullet: const TextStyle(
+                  color: Color(0xFF38BDF8),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+                listIndent: 20,
+                blockSpacing: 10,
+                h1: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                h2: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                h3: const TextStyle(color: Color(0xFF38BDF8), fontWeight: FontWeight.w700, fontSize: 15),
+                tableHead: const TextStyle(color: Color(0xFF38BDF8), fontWeight: FontWeight.bold),
+                tableBody: const TextStyle(color: Colors.white),
+                tableBorder: TableBorder.all(color: const Color(0xFF334155), width: 1),
+                tableCellsPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 }
+
 
