@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
+import '../models/app_language.dart';
 import '../models/summary_mode.dart';
 import 'prompt_engine.dart';
 
@@ -14,10 +15,11 @@ class GroqSummarizerService {
 
   GroqSummarizerService({http.Client? client}) : _client = client ?? http.Client();
 
-  /// Summarizes the provided [text] according to the selected [mode].
+  /// Summarizes the provided [text] according to the selected [mode] and [language].
   Future<String> summarizeText({
     required String text,
     SummaryMode mode = SummaryMode.executive,
+    AppLanguage language = AppLanguage.tr,
   }) async {
     final trimmed = text.trim();
     if (trimmed.isEmpty) {
@@ -38,7 +40,11 @@ class GroqSummarizerService {
 
     final body = jsonEncode({
       'model': ApiConfig.model,
-      'messages': PromptEngine.buildMessages(text: trimmed, mode: mode),
+      'messages': PromptEngine.buildMessages(
+        text: trimmed,
+        mode: mode,
+        language: language,
+      ),
       'temperature': mode.temperature,
       'max_tokens': 2048,
       'stream': false,

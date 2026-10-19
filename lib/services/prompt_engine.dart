@@ -1,17 +1,19 @@
+import '../models/app_language.dart';
 import '../models/summary_mode.dart';
 
 /// Service responsible for constructing optimized LLM prompts based on
-/// the selected summarization mode, system persona, and language constraints.
+/// the selected summarization mode, system persona, and target output language.
 class PromptEngine {
-  /// Builds the messages payload for OpenAI/Groq Chat Completions API.
+  /// Builds the messages payload for Groq / OpenAI Chat Completions API.
   static List<Map<String, String>> buildMessages({
     required String text,
     required SummaryMode mode,
+    required AppLanguage language,
   }) {
     return [
       {
         'role': 'system',
-        'content': _getSystemPrompt(mode),
+        'content': _getSystemPrompt(mode, language),
       },
       {
         'role': 'user',
@@ -20,13 +22,16 @@ class PromptEngine {
     ];
   }
 
-  /// Returns a tailored system prompt enforcing tone, length, and anti-hallucination constraints.
-  static String _getSystemPrompt(SummaryMode mode) {
+  /// Returns a tailored system prompt enforcing persona, length, and strict target language.
+  static String _getSystemPrompt(SummaryMode mode, AppLanguage language) {
+    final languageDirective = language.promptDirective;
+
     final baseRules =
         'CRITICAL INSTRUCTIONS:\n'
-        '1. Respond in the exact same language as the input text (e.g., Turkish for Turkish text, English for English text).\n'
-        '2. Base your summary strictly on the provided content. Never hallucinate, invent data, or extrapolate beyond the source.\n'
-        '3. Do not add introductory fluff like "Here is the summary:" or "In summary,". Start directly with the summarized content.';
+        '1. $languageDirective\n'
+        '2. Base your summary strictly on the provided content. Never hallucinate, invent facts, or extrapolate beyond the text.\n'
+        '3. Do not add conversational fluff (e.g., "Here is your summary:", "İşte özet:"). Start directly with the synthesized content.\n'
+        '4. Even if the input text is in a different language, translate and synthesize the key information directly into the target language.';
 
     switch (mode) {
       case SummaryMode.executive:
